@@ -1,1 +1,3 @@
 big_query_credentials.json
+*/__pycache__/*
+*/.env
