@@ -29,20 +29,14 @@ variable "subdomain" {
   description = "If set, it will be prepended to the domain to form a subdomain."
 }
 
-
-
-variable "contexts_function_name" {
-  type        = string
-  description = "Name of the contexts Cloud Function"
-}
-
 variable "functions_path_prefix" {
   type        = string
   description = "Path prefix for the functions services"
 }
 
-variable "contexts_function_path_prefix" {
-  type        = string
-  description = "Path prefix for the contexts function"
+variable "cloud_functions" {
+  type = map(object({
+    name        = string
+    path_prefix = string
+  }))
 }
-

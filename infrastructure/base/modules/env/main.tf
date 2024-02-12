@@ -1,31 +1,31 @@
 resource "google_project_service" "iam_service" {
   project            = var.gcp_project_id
   service            = "iam.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_project_service" "cloud_functions_api" {
   project            = var.gcp_project_id
   service            = "cloudfunctions.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudrun_api" {
   project            = var.gcp_project_id
   service            = "run.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudbuild_api" {
   project            = var.gcp_project_id
   service            = "cloudbuild.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_project_service" "compute_api" {
   project            = var.gcp_project_id
   service            = "compute.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 locals {
@@ -42,8 +42,6 @@ module "big_query_credentials" {
 }
 
 locals {
-  contexts_cf_lb_url = "https://${local.domain}/${var.functions_path_prefix}/${var.contexts_function_path_prefix}/"
-
   cloud_function_env = {
 
   }
@@ -125,16 +123,33 @@ variable "roles" {
 }
 
 module "load_balancer" {
-  source                        = "../load-balancer"
-  region                        = var.gcp_region
-  project                       = var.gcp_project_id
-  name                          = var.project_name
-  contexts_function_name        = module.contexts_cloud_function.function_name
-  domain                        = var.domain
-  subdomain                     = var.subdomain
-  dns_managed_zone_name         = var.dns_zone_name
-  functions_path_prefix         = var.functions_path_prefix
-  contexts_function_path_prefix = var.contexts_function_path_prefix
+  source                = "../load-balancer"
+  region                = var.gcp_region
+  project               = var.gcp_project_id
+  name                  = var.project_name
+  domain                = var.domain
+  subdomain             = var.subdomain
+  dns_managed_zone_name = var.dns_zone_name
+  functions_path_prefix = var.functions_path_prefix
+
+  cloud_functions = {
+    contexts = {
+      name        = module.contexts_cloud_function.function_name
+      path_prefix = "contexts"
+    },
+    columns = {
+      name        = module.columns_cloud_function.function_name
+      path_prefix = "columns"
+    },
+    nodes = {
+      name        = module.nodes_cloud_function.function_name
+      path_prefix = "nodes"
+    },
+    top-nodes = {
+      name        = module.top_nodes_cloud_function.function_name
+      path_prefix = "top-nodes"
+    }
+  }
 
   depends_on = [google_project_service.compute_api]
 }
@@ -146,15 +161,75 @@ module "contexts_cloud_function" {
   function_name                    = "${var.project_name}-contexts"
   description                      = "Contexts Cloud Function"
   source_dir                       = "${path.root}/../../cloud_functions/contexts"
-  runtime                          = "ruby32"
+  runtime                          = "python312"
   entry_point                      = "index"
   runtime_environment_variables    = local.cloud_function_env
   secrets                          = local.cloud_function_secrets
-  timeout_seconds                  = var.contexts_function_timeout_seconds
+  timeout_seconds                  = var.function_timeout_seconds
   available_memory                 = var.contexts_function_available_memory
-  available_cpu                    = var.contexts_function_available_cpu
-  max_instance_count               = var.contexts_function_max_instance_count
-  max_instance_request_concurrency = var.contexts_function_max_instance_request_concurrency
+  available_cpu                    = var.function_available_cpu
+  max_instance_count               = var.function_max_instance_count
+  max_instance_request_concurrency = var.function_max_instance_request_concurrency
+
+  depends_on = [google_project_service.cloudrun_api]
+}
+
+module "columns_cloud_function" {
+  source                           = "../cloudfunction"
+  region                           = var.gcp_region
+  cf_service_account               = google_service_account.cf_service_account
+  function_name                    = "${var.project_name}-columns"
+  description                      = "Columns Cloud Function"
+  source_dir                       = "${path.root}/../../cloud_functions/columns"
+  runtime                          = "python312"
+  entry_point                      = "index"
+  runtime_environment_variables    = local.cloud_function_env
+  secrets                          = local.cloud_function_secrets
+  timeout_seconds                  = var.function_timeout_seconds
+  available_memory                 = var.function_available_memory
+  available_cpu                    = var.function_available_cpu
+  max_instance_count               = var.function_max_instance_count
+  max_instance_request_concurrency = var.function_max_instance_request_concurrency
+
+  depends_on = [google_project_service.cloudrun_api]
+}
+
+module "nodes_cloud_function" {
+  source                           = "../cloudfunction"
+  region                           = var.gcp_region
+  cf_service_account               = google_service_account.cf_service_account
+  function_name                    = "${var.project_name}-nodes"
+  description                      = "Nodes Cloud Function"
+  source_dir                       = "${path.root}/../../cloud_functions/nodes"
+  runtime                          = "python312"
+  entry_point                      = "index"
+  runtime_environment_variables    = local.cloud_function_env
+  secrets                          = local.cloud_function_secrets
+  timeout_seconds                  = var.function_timeout_seconds
+  available_memory                 = var.nodes_function_available_memory
+  available_cpu                    = var.function_available_cpu
+  max_instance_count               = var.function_max_instance_count
+  max_instance_request_concurrency = var.function_max_instance_request_concurrency
+
+  depends_on = [google_project_service.cloudrun_api]
+}
+
+module "top_nodes_cloud_function" {
+  source                           = "../cloudfunction"
+  region                           = var.gcp_region
+  cf_service_account               = google_service_account.cf_service_account
+  function_name                    = "${var.project_name}-top-nodes"
+  description                      = "Top Nodes Cloud Function"
+  source_dir                       = "${path.root}/../../cloud_functions/top_nodes"
+  runtime                          = "python312"
+  entry_point                      = "index"
+  runtime_environment_variables    = local.cloud_function_env
+  secrets                          = local.cloud_function_secrets
+  timeout_seconds                  = var.function_timeout_seconds
+  available_memory                 = var.function_available_memory
+  available_cpu                    = var.function_available_cpu
+  max_instance_count               = var.function_max_instance_count
+  max_instance_request_concurrency = var.function_max_instance_request_concurrency
 
   depends_on = [google_project_service.cloudrun_api]
 }

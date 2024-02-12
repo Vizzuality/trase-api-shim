@@ -65,7 +65,7 @@ resource "google_compute_global_forwarding_rule" "http-redirect" {
 resource "google_compute_url_map" "load-balancer-url-map" {
   name            = "${var.name}-lb"
   description     = "Load balancer for ${var.name}"
-  default_service = google_compute_backend_service.contexts_service.id
+  default_service = google_compute_backend_service.function_backend_service["contexts"].id
 
   host_rule {
     hosts        = [local.domain]
@@ -74,39 +74,99 @@ resource "google_compute_url_map" "load-balancer-url-map" {
 
   path_matcher {
     name            = "site"
-    default_service = google_compute_backend_service.contexts_service.id
+    default_service = google_compute_backend_service.function_backend_service["contexts"].id
 
     path_rule {
-      paths   = ["/${var.functions_path_prefix}/${var.contexts_function_path_prefix}/*"]
-      service = google_compute_backend_service.contexts_service.id
+      service = google_compute_backend_service.function_backend_service["contexts"].id
+      paths   = ["/${var.functions_path_prefix}/${var.cloud_functions["contexts"].path_prefix}/*"]
       route_action {
         url_rewrite {
           path_prefix_rewrite = "/"
         }
+        # cors_policy {
+        #   allow_origins      = ["*"]
+        #   allow_methods     = ["GET", "OPTIONS"]
+        #   allow_headers     = ["Content-Type"]
+        #   max_age = 30
+        #   disabled = false
+        # }
+      }
+    }
+
+    path_rule {
+      service = google_compute_backend_service.function_backend_service["columns"].id
+      paths   = ["/${var.functions_path_prefix}/${var.cloud_functions["columns"].path_prefix}/*"]
+      route_action {
+        url_rewrite {
+          path_prefix_rewrite = "/"
+        }
+        # cors_policy {
+        #   allow_origins      = ["*"]
+        #   allow_methods     = ["GET", "OPTIONS"]
+        #   allow_headers     = ["Content-Type"]
+        #   max_age = 30
+        #   disabled = false
+        # }
+      }
+    }
+
+    path_rule {
+      service = google_compute_backend_service.function_backend_service["nodes"].id
+      paths   = ["/${var.functions_path_prefix}/${var.cloud_functions["nodes"].path_prefix}/*"]
+      route_action {
+        url_rewrite {
+          path_prefix_rewrite = "/"
+        }
+        # cors_policy {
+        #   allow_origins      = ["*"]
+        #   allow_methods     = ["GET", "OPTIONS"]
+        #   allow_headers     = ["Content-Type"]
+        #   max_age = 30
+        #   disabled = false
+        # }
+      }
+    }
+
+    path_rule {
+      service = google_compute_backend_service.function_backend_service["top-nodes"].id
+      paths   = ["/${var.functions_path_prefix}/${var.cloud_functions["top-nodes"].path_prefix}/*"]
+      route_action {
+        url_rewrite {
+          path_prefix_rewrite = "/"
+        }
+        # cors_policy {
+        #   allow_origins      = ["*"]
+        #   allow_methods     = ["GET", "OPTIONS"]
+        #   allow_headers     = ["Content-Type"]
+        #   max_age = 30
+        #   disabled = false
+        # }
       }
     }
   }
 }
 
-resource "google_compute_region_network_endpoint_group" "function_contexts_neg" {
-  name                  = "${var.name}-contexts-neg"
+resource "google_compute_region_network_endpoint_group" "cloud_function_neg" {
+  for_each              = var.cloud_functions
+  name                  = "${var.name}-${each.key}"
+  description           = "${var.name}-${each.key} NEG"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
   cloud_function {
-    function = var.contexts_function_name
+    function = var.cloud_functions[each.key].name
   }
 }
 
-resource "google_compute_backend_service" "contexts_service" {
-  name        = "${var.name}-contexts-service"
-  description = "${var.name} contexts service"
+resource "google_compute_backend_service" "function_backend_service" {
+  for_each    = google_compute_region_network_endpoint_group.cloud_function_neg
+  name        = each.value.name
+  description = "${each.value.name} backend service"
 
   backend {
-    group = google_compute_region_network_endpoint_group.function_contexts_neg.id
+    group = each.value.id
   }
 }
 
-# DNS record
 resource "google_dns_record_set" "frontend-dns-record-set" {
   project      = var.project
   name         = "${local.domain}."

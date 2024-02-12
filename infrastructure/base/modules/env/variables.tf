@@ -68,42 +68,49 @@ variable "functions_path_prefix" {
   description = "Path prefix for the functions services"
 }
 
-variable "contexts_function_path_prefix" {
-  type        = string
-  description = "Path prefix for the contexts function"
-}
-
-variable "contexts_function_timeout_seconds" {
+variable "function_timeout_seconds" {
   type        = number
   default     = 180
-  description = "Timeout for the contexts function"
+  description = "Timeout for a cloud function"
 }
 
-variable "contexts_function_available_memory" {
+variable "function_available_memory" {
   type        = string
   default     = "128Mi"
-  description = "Available memory for the contexts function"
+  description = "Available memory for a cloud function"
 }
 
-variable "contexts_function_available_cpu" {
+variable "function_available_cpu" {
   type        = number
   nullable    = true
-  description = "Available cpu for the contexts function"
+  description = "Available cpu for a cloud function"
 }
 
-variable "contexts_function_max_instance_count" {
+variable "function_max_instance_count" {
   type        = number
   default     = 1
-  description = "Max instance count for the contexts function"
+  description = "Max instance count for a cloud function"
 }
 
-variable "contexts_function_max_instance_request_concurrency" {
+variable "function_max_instance_request_concurrency" {
   type        = number
   default     = 1
-  description = "Max instance request concurrency for the contexts function"
+  description = "Max instance request concurrency for a cloud function"
 }
 
 variable "big_query_credentials" {
   type        = string
   description = "Big Query credentials.json"
+}
+
+variable "contexts_function_available_memory" {
+  type        = string
+  default     = "256Mi"
+  description = "Available memory for the contexts function"
+}
+
+variable "nodes_function_available_memory" {
+  type        = string
+  default     = "256Mi"
+  description = "Available memory for the nodes function"
 }
