@@ -70,7 +70,7 @@ def index(request):
     }
 
     try:
-        service = GetTopNodes(globals()["bigquery"], parameters)
+        service = GetTopNodes(globals()["bigquery"], os.getenv("BIGQUERY_SNAPSHOT"), parameters)
         service.call()
         return (service.result, 200, headers)
     except TypeError as e:

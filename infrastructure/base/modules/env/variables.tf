@@ -98,7 +98,7 @@ variable "function_max_instance_request_concurrency" {
   description = "Max instance request concurrency for a cloud function"
 }
 
-variable "big_query_credentials" {
+variable "bigquery_credentials" {
   type        = string
   description = "Big Query credentials.json"
 }
@@ -113,4 +113,9 @@ variable "nodes_function_available_memory" {
   type        = string
   default     = "256Mi"
   description = "Available memory for the nodes function"
+}
+
+variable "bigquery_snapshot" {
+  type        = string
+  description = "Symbol for the BigQuery snapshot"
 }

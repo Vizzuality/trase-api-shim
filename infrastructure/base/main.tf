@@ -27,7 +27,8 @@ module "production" {
   nodes_function_available_memory           = "256Mi"
   function_available_cpu                    = null
   environment                               = "production"
-  big_query_credentials                     = file("${path.root}/../../cloud_functions/big_query_credentials.json")
+  bigquery_credentials                      = file("${path.root}/../../cloud_functions/bigquery_credentials.json")
+  bigquery_snapshot                         = var.bigquery_snapshot
 }
 
 module "dns" {

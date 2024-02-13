@@ -1,8 +1,9 @@
 from google.cloud import bigquery
 
 class GetNodes:
-    def __init__(self, bigquery_client, cc, parameters):
+    def __init__(self, bigquery_client, bigquery_snapshot, cc, parameters):
         self.bigquery_client = bigquery_client
+        self.bigquery_snapshot = bigquery_snapshot
         self.cc = cc
         self.parameters = parameters
         self.result = None
@@ -36,13 +37,18 @@ class GetNodes:
         return [node_column_id for node_column_id in column_names if node_column_id in available_node_column_names]
 
     def available_node_column_names(self):
-        sql = "SELECT column_in_supply_chains_table FROM `trase-396112.website.flows_nodes_metadata` WHERE context_slug = @context_slug ORDER BY display_order"
+        sql = f"""
+            SELECT
+            column_in_supply_chains_table
+            FROM `trase-396112.website.flows_nodes_metadata{self.bigquery_snapshot}`
+            WHERE context_slug = @context_slug
+            ORDER BY display_order
+        """
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("context_slug", "STRING", self.context_slug)
             ]
         )
-
         result = self.bigquery_client.query(sql, job_config=job_config).result()
         return [row['column_in_supply_chains_table'] for row in result]
 
@@ -50,7 +56,7 @@ class GetNodes:
         # construct a UNION ALL query
         # for each column in column_names, select the distinct values of that column as name and the name of the column as type
         # return the result of the query
-        sql = " UNION ALL ".join([f"SELECT DISTINCT {column_name} AS name, '{column_name}' AS type FROM `trase-396112.website.supply_chains_2024-01-17_oxindole` WHERE context_slug = @context_slug" for column_name in self.column_names])
+        sql = " UNION ALL ".join([f"SELECT DISTINCT {column_name} AS name, '{column_name}' AS type FROM `trase-396112.website.supply_chains{self.bigquery_snapshot}` WHERE context_slug = @context_slug AND {column_name} IS NOT NULL" for column_name in self.column_names])
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("context_slug", "STRING", self.context_slug)

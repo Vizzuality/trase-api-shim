@@ -55,7 +55,7 @@ def index(request):
     }
 
     try:
-        service = GetColumns(globals()["bigquery"], parameters)
+        service = GetColumns(globals()["bigquery"], os.getenv("BIGQUERY_SNAPSHOT"), parameters)
         service.call()
         return (service.result, 200, headers)
     except Exception as e:

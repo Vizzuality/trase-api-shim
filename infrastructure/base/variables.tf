@@ -50,3 +50,8 @@ variable "production_subdomain" {
   type        = string
   description = "Subdomain for the production environment"
 }
+
+variable "bigquery_snapshot" {
+  type        = string
+  description = "Symbol for the BigQuery snapshot"
+}

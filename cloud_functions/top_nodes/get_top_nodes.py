@@ -3,8 +3,9 @@ from google.cloud import bigquery
 class GetTopNodes:
     DEFAULT_TOP_N = 15
 
-    def __init__(self, bigquery_client, parameters):
+    def __init__(self, bigquery_client, bigquery_snapshot, parameters):
         self.bigquery_client = bigquery_client
+        self.bigquery_snapshot = bigquery_snapshot
         self.parameters = parameters
         self.result = None
 
@@ -65,26 +66,34 @@ class GetTopNodes:
             self.end_year = self.start_year
 
     def available_node_column_names(self):
-        sql = "SELECT column_in_supply_chains_table FROM `trase-396112.website.flows_nodes_metadata` WHERE context_slug = @context_slug ORDER BY display_order"
-
+        sql = f"""
+            SELECT
+            column_in_supply_chains_table
+            FROM `trase-396112.website.flows_nodes_metadata{self.bigquery_snapshot}`
+            WHERE context_slug = @context_slug
+            ORDER BY display_order
+        """
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("context_slug", "STRING", self.context_slug)
             ]
         )
-
         result = self.bigquery_client.query(sql, job_config=job_config).result()
         return [row['column_in_supply_chains_table'] for row in result]
 
     def available_metric_column_names(self):
-        sql = "SELECT column_in_supply_chains_table FROM `trase-396112.website.flows_metrics_metadata` WHERE context_slug = @context_slug ORDER BY display_order"
-
+        sql = f"""
+            SELECT
+            column_in_supply_chains_table
+            FROM `trase-396112.website.flows_metrics_metadata{self.bigquery_snapshot}`
+            WHERE context_slug = @context_slug
+            ORDER BY display_order
+        """
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("context_slug", "STRING", self.context_slug)
             ]
         )
-
         result = self.bigquery_client.query(sql, job_config=job_config).result()
         return [row['column_in_supply_chains_table'] for row in result]
 
@@ -104,7 +113,7 @@ class GetTopNodes:
 
         # constructs the query to get the top-n flows by sum of metric column aggregated by node column in the given context
         # optionally filtered by nodes
-        sql = f"SELECT {node_column} AS node, SUM({metric_column}) AS value FROM `trase-396112.website.supply_chains_2024-01-17_oxindole`"
+        sql = f"SELECT {node_column} AS node, SUM({metric_column}) AS value FROM `trase-396112.website.supply_chains{self.bigquery_snapshot}`"
         sql += " WHERE " + " AND ".join(conditions)
         sql += f" GROUP BY node ORDER BY value DESC LIMIT @top_n"
         

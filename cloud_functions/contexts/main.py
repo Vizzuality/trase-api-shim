@@ -53,7 +53,7 @@ def index(request):
     headers = {"Access-Control-Allow-Origin": "*"}
 
     try:
-        service = GetContexts(globals()["bigquery"], globals()["cc"])
+        service = GetContexts(globals()["bigquery"], os.getenv("BIGQUERY_SNAPSHOT"), globals()["cc"])
         service.call()
         return (service.result, 200, headers)
     except Exception as e:

@@ -32,25 +32,25 @@ locals {
   domain = var.subdomain == "" ? var.domain : "${var.subdomain}.${var.domain}"
 }
 
-module "big_query_credentials" {
+module "bigquery_credentials" {
   source           = "../secret_value"
   gcp_project_id   = var.gcp_project_id
   region           = var.gcp_region
-  key              = "${var.project_name}_big_query_credentials"
-  value            = var.big_query_credentials
+  key              = "${var.project_name}_bigquery_credentials"
+  value            = var.bigquery_credentials
   use_random_value = false
 }
 
 locals {
   cloud_function_env = {
-
+    "BIGQUERY_SNAPSHOT" = var.bigquery_snapshot
   }
   cloud_function_secrets = [
     {
-      key        = "BIG_QUERY_CREDENTIALS"
+      key        = "BIGQUERY_CREDENTIALS"
       project_id = var.gcp_project_id
-      secret     = module.big_query_credentials.secret_name
-      version    = module.big_query_credentials.latest_version
+      secret     = module.bigquery_credentials.secret_name
+      version    = module.bigquery_credentials.latest_version
     }
   ]
 }
