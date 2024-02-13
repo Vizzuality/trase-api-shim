@@ -4,6 +4,7 @@ import json
 
 from google.oauth2 import service_account
 from google.cloud import bigquery
+from google.cloud import error_reporting
 import country_converter as coco
 
 import os
@@ -14,9 +15,11 @@ load_dotenv()
 service_account_info = json.loads(os.getenv("BIGQUERY_CREDENTIALS"))
 credentials = service_account.Credentials.from_service_account_info(service_account_info)
 bigquery_client = bigquery.Client(project=os.getenv("BIGQUERY_PROJECT"), credentials=credentials)
+error_reporting_client = error_reporting.Client()
 
 # Set global variable to pass data into function invocations
 globals()["bigquery"] = bigquery_client
+globals()["error_reporting"] = error_reporting_client
 globals()["cc"] = coco.CountryConverter()
 
 from get_nodes import GetNodes
@@ -66,4 +69,5 @@ def index(request):
     except ValueError as e:
         return ({"error": str(e)}, 400, headers)
     except Exception as e:
+        globals()["error_reporting"].report_exception()
         return ({"error": str(e)}, 500, headers)

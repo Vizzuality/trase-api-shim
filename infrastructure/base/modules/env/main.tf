@@ -91,6 +91,24 @@ resource "google_secret_manager_secret_iam_member" "secret_access" {
   depends_on = [google_service_account.cf_service_account]
 }
 
+resource "google_project_iam_member" "cf_service_account_roles" {
+  count = length(var.cf_service_account_roles_list)
+
+  project = var.gcp_project_id
+  role    = var.cf_service_account_roles_list[count.index]
+  member  = "serviceAccount:${google_service_account.cf_service_account.email}"
+
+  depends_on = [google_service_account.cf_service_account]
+}
+
+variable "cf_service_account_roles_list" {
+  description = "List of roles to grant to the Cloud Functions Service Account"
+  type        = list(string)
+  default = [
+    "roles/errorreporting.writer"
+  ]
+}
+
 # Deploy service account
 
 resource "google_service_account" "deploy_service_account" {
