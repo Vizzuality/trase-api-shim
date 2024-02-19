@@ -21,7 +21,7 @@ class GetContexts:
             max_year,
             short_name,
             long_name
-            FROM `trase-396112.website.flows_metrics_metadata{self.bigquery_snapshot}`
+            FROM `{self.bigquery_client.project}.website.flows_metrics_metadata{self.bigquery_snapshot}`
             ORDER BY context_slug, column_in_supply_chains_table
         """
         return self.bigquery_client.query(sql).result()
@@ -34,7 +34,7 @@ class GetContexts:
             c.country_of_production_slug,
             c.commodity,
             c.commodity_slug
-            FROM `trase-396112.website.supply_chains_contexts{self.bigquery_snapshot}` c
+            FROM `{self.bigquery_client.project}.website.supply_chains_contexts{self.bigquery_snapshot}` c
             WHERE country_of_production NOT IN (
                 'AUSTRALIA', 'MALAYSIA', 'SOUTH AFRICA', 'THAILAND', 'VIETNAM'
             )

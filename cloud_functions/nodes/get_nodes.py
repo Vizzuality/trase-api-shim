@@ -40,7 +40,7 @@ class GetNodes:
         sql = f"""
             SELECT
             column_in_supply_chains_table
-            FROM `trase-396112.website.flows_nodes_metadata{self.bigquery_snapshot}`
+            FROM `{self.bigquery_client.project}.website.flows_nodes_metadata{self.bigquery_snapshot}`
             WHERE context_slug = @context_slug
             ORDER BY display_order
         """
@@ -54,9 +54,23 @@ class GetNodes:
 
     def nodes(self):
         # construct a UNION ALL query
-        # for each column in column_names, select the distinct values of that column as name and the name of the column as type
-        # return the result of the query
-        sql = " UNION ALL ".join([f"SELECT DISTINCT {column_name} AS name, '{column_name}' AS type FROM `trase-396112.website.supply_chains{self.bigquery_snapshot}` WHERE context_slug = @context_slug AND {column_name} IS NOT NULL" for column_name in self.column_names])
+        union_partial_queries = []
+        for column_name in self.column_names:
+            # for each column in column_names, select the distinct values of that column as name and the name of the column as type
+            select_columns = [
+                f"{column_name} AS name",
+                f"'{column_name}' AS type"
+            ]
+            union_partial_queries.append(
+                f"""
+                SELECT
+                DISTINCT {", ".join(select_columns)}
+                FROM `{self.bigquery_client.project}.website.supply_chains{self.bigquery_snapshot}`
+                WHERE context_slug = @context_slug
+                AND {column_name} IS NOT NULL
+                """
+            )
+        sql = " UNION ALL ".join(union_partial_queries)
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("context_slug", "STRING", self.context_slug)

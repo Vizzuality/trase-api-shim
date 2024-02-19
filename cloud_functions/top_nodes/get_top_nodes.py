@@ -69,7 +69,7 @@ class GetTopNodes:
         sql = f"""
             SELECT
             column_in_supply_chains_table
-            FROM `trase-396112.website.flows_nodes_metadata{self.bigquery_snapshot}`
+            FROM `{self.bigquery_client.project}.website.flows_nodes_metadata{self.bigquery_snapshot}`
             WHERE context_slug = @context_slug
             ORDER BY display_order
         """
@@ -85,7 +85,7 @@ class GetTopNodes:
         sql = f"""
             SELECT
             column_in_supply_chains_table
-            FROM `trase-396112.website.flows_metrics_metadata{self.bigquery_snapshot}`
+            FROM `{self.bigquery_client.project}.website.flows_metrics_metadata{self.bigquery_snapshot}`
             WHERE context_slug = @context_slug
             ORDER BY display_order
         """
@@ -113,7 +113,7 @@ class GetTopNodes:
 
         # constructs the query to get the top-n flows by sum of metric column aggregated by node column in the given context
         # optionally filtered by nodes
-        sql = f"SELECT {node_column} AS node, SUM({metric_column}) AS value FROM `trase-396112.website.supply_chains{self.bigquery_snapshot}`"
+        sql = f"SELECT {node_column} AS node, SUM({metric_column}) AS value FROM `{self.bigquery_client.project}.website.supply_chains{self.bigquery_snapshot}`"
         sql += " WHERE " + " AND ".join(conditions)
         sql += f" GROUP BY node ORDER BY value DESC LIMIT @top_n"
         

@@ -24,7 +24,7 @@ class GetColumns:
             short_name,
             display_order,
             display_by_default
-            FROM `trase-396112.website.flows_nodes_metadata{self.bigquery_snapshot}`
+            FROM `{self.bigquery_client.project}.website.flows_nodes_metadata{self.bigquery_snapshot}`
             WHERE context_slug = @context_slug
             ORDER BY display_order
         """
