@@ -56,21 +56,27 @@ locals {
 }
 
 locals {
-  gcp_sa_key       = "${upper(var.environment)}_GCP_SA_KEY"
-  project_name     = "${upper(var.environment)}_PROJECT_NAME"
-  contexts_cf_name = "${upper(var.environment)}_CONTEXTS_CF_NAME"
+  gcp_sa_key        = "${upper(var.environment)}_GCP_SA_KEY"
+  contexts_cf_name  = "${upper(var.environment)}_CONTEXTS_CF_NAME"
+  columns_cf_name   = "${upper(var.environment)}_COLUMNS_CF_NAME"
+  nodes_cf_name     = "${upper(var.environment)}_NODES_CF_NAME"
+  top_nodes_cf_name = "${upper(var.environment)}_TOP_NODES_CF_NAME"
 }
 
 module "github_values" {
   source    = "../github_values"
   repo_name = var.github_project
   secret_map = {
-    GCP_PROJECT_ID           = var.gcp_project_id
-    GCP_REGION               = var.gcp_region
-    (local.gcp_sa_key)       = base64decode(google_service_account_key.deploy_service_account_key.private_key)
-    (local.project_name)     = var.project_name
-    (local.contexts_cf_name) = module.contexts_cloud_function.function_name
-  project = var.gcp_project_id }
+    GCP_PROJECT_ID            = var.gcp_project_id
+    GCP_REGION                = var.gcp_region
+    (local.gcp_sa_key)        = base64decode(google_service_account_key.deploy_service_account_key.private_key)
+  }
+  variable_map = {
+    (local.contexts_cf_name)  = module.contexts_cloud_function.function_name
+    (local.columns_cf_name)   = module.columns_cloud_function.function_name
+    (local.nodes_cf_name)     = module.nodes_cloud_function.function_name
+    (local.top_nodes_cf_name) = module.top_nodes_cloud_function.function_name
+  }
 }
 
 #
@@ -133,9 +139,9 @@ variable "roles" {
   description = "List of roles to grant to the Cloud Run Deploy Service Account"
   type        = list(string)
   default = [
-    # "roles/iam.serviceAccountTokenCreator",
+    "roles/iam.serviceAccountTokenCreator", # required for iam.serviceAccounts.getAccessToken
     "roles/iam.serviceAccountUser",
-    # "roles/run.developer",
+    "roles/run.developer",
     "roles/cloudfunctions.developer"
   ]
 }
