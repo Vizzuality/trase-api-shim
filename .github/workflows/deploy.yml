@@ -1,0 +1,43 @@
+# The workflow uses GH Secrets managed by Terraform:
+# - GCP_PROJECT_ID
+# - GCP_REGION
+# - <environment>_GCP_SA_KEY - credentials json for authentication
+# - <environment>_CONTEXTS_CF_NAME
+# - <environment>_COLUMNS_CF_NAME
+# - <environment>_NODES_CF_NAME
+# - <environment>_TOP_NODES_CF_NAME
+
+name: Run deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+
+    paths:
+      - 'cloud_functions/**'
+      - '.github/workflows/*'
+
+jobs:
+  deploy_contexts_cloud_function:
+    uses: ./.github/workflows/deploy_cloud_function.yml
+    secrets: inherit
+    with:
+      cloud_function_name: CONTEXTS
+  deploy_columns_cloud_function:
+    uses: ./.github/workflows/deploy_cloud_function.yml
+    secrets: inherit
+    with:
+      cloud_function_name: COLUMNS
+  deploy_nodes_cloud_function:
+    uses: ./.github/workflows/deploy_cloud_function.yml
+    secrets: inherit
+    with:
+      cloud_function_name: NODES
+  deploy_top_nodes_cloud_function:
+    uses: ./.github/workflows/deploy_cloud_function.yml
+    secrets: inherit
+    with:
+      cloud_function_name: TOP_NODES

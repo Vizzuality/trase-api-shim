@@ -1,0 +1,51 @@
+name: Deploy Cloud Function
+
+on:
+  workflow_call:
+    inputs:
+      cloud_function_name:
+        required: true
+        type: string
+
+jobs:       
+  deploy_cloud_function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Extract environment name
+        env:
+          ENVIRONMENT: ${{ steps.extract_branch.outputs.branch == 'main' && 'PRODUCTION' || 'STAGING' }}
+        run: echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+        id: extract_environment
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: "${{ secrets[format('{0}_GCP_SA_KEY', steps.extract_environment.outputs.environment)] }}"
+          token_format: 'access_token'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+
+      - name: 'Deploy to gen2 cloud function'
+        run:  |
+          CF_NAME=${{ vars[format('{0}_{1}_CF_NAME', steps.extract_environment.outputs.environment, inputs.cloud_function_name)] }}
+          CF_SRC=$(echo ${{inputs.cloud_function_name}} | tr '[A-Z]' '[a-z]')
+          gcloud functions deploy $CF_NAME \
+          --gen2 \
+          --region=${{ secrets.GCP_REGION }} \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --source=./cloud_functions/$CF_SRC \
