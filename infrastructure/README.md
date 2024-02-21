@@ -99,6 +99,10 @@ This needs to be repeated when there are changes to the infrastructure settings 
     ```
 - `GITHUB_TOKEN=... GITHUB_OWNER=.. terraform apply -var-file=vars/terraform.tfvars`
 
+#### DNS changes
+
+After the cloud functions and the load balancer are provisioned, an A type record needs to added to the DNS of the required domain to point to the load balancer's IP.
+
 ### GitHub Actions
 
 As part of this infrastructure, GitHub Actions are used to automatically apply code updates for the client application, API/CMS and the cloud functions.
