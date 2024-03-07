@@ -95,7 +95,7 @@ This needs to be repeated when there are changes to the infrastructure settings 
     domain = "YOUR DOMAIN e.g. example.com"
     production_subdomain = "trase-api" # the shim will be at trase-api.example.com
 
-    bigquery_snapshot = "_2024-01-17_oxindole" # symbol of the BigQuery snapshot
+    bigquery_snapshot = "_2024-03-05_burk" # symbol of the BigQuery snapshot
     ```
 - `GITHUB_TOKEN=... GITHUB_OWNER=.. terraform apply -var-file=vars/terraform.tfvars`
 

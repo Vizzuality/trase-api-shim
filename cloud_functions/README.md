@@ -14,7 +14,7 @@ Each of the functions' code is contained in a subdirectory with the following fi
 Each function requires the following variables / secrets:
 - `BIGQUERY_PROJECT` - the GCP project id
 - `BIGQUERY_CREDENTIALS` - the JSON credentials
-- `BIGQUERY_SNAPSHOT` - the symbol of the snapshot, e.g. "_2024-01-17_oxindole"
+- `BIGQUERY_SNAPSHOT` - the symbol of the snapshot, e.g. "_2024-03-05_burk"
 
 Those need to be set:
 - when running locally, in each cloud function's .env file.
