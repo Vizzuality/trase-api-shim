@@ -23,7 +23,7 @@ module "production" {
   function_max_instance_count               = 1
   function_max_instance_request_concurrency = 1
   function_available_memory                 = "128Mi"
-  contexts_function_available_memory        = "256Mi"
+  contexts_function_available_memory        = "128Mi"
   nodes_function_available_memory           = "256Mi"
   function_available_cpu                    = null
   environment                               = "production"
