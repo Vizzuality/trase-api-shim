@@ -1,8 +1,7 @@
 class GetContexts:
-    def __init__(self, bigquery_client, bigquery_snapshot, cc):
+    def __init__(self, bigquery_client, bigquery_snapshot):
         self.bigquery_client = bigquery_client
         self.bigquery_snapshot = bigquery_snapshot
-        self.cc = cc
         self.result = None
 
     def call(self):
@@ -32,13 +31,14 @@ class GetContexts:
             c.context_slug,
             c.country_of_production,
             c.country_of_production_slug,
+            c.country_of_production_trase_id,
             c.commodity,
             c.commodity_slug
             FROM `{self.bigquery_client.project}.website.supply_chains_contexts{self.bigquery_snapshot}` c
             WHERE country_of_production NOT IN (
                 'AUSTRALIA', 'MALAYSIA', 'SOUTH AFRICA', 'THAILAND', 'VIETNAM'
             )
-            GROUP BY 1,2,3,4,5
+            GROUP BY 1,2,3,4,5,6
             ORDER BY c.context_slug
         """
         return self.bigquery_client.query(sql).result()
@@ -58,7 +58,7 @@ class GetContexts:
                 'commodityId': row['commodity_slug'],
                 'commodityName': row['commodity'],
                 'worldMap': {
-                    'geoId': self.cc.convert(names=row['country_of_production'], to='iso2'),
+                    'geoId': row['country_of_production_trase_id']
                 },
                 'resizeBy': [{
                     'unit': attribute['unit_abbreviation'],

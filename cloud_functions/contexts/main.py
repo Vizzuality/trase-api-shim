@@ -5,7 +5,6 @@ import json
 from google.oauth2 import service_account
 from google.cloud import bigquery
 from google.cloud import error_reporting
-import country_converter as coco
 
 import os
 from dotenv import load_dotenv
@@ -20,7 +19,6 @@ error_reporting_client = error_reporting.Client()
 # Set global variables to pass data into function invocations
 globals()["bigquery"] = bigquery_client
 globals()["error_reporting"] = error_reporting_client
-globals()["cc"] = coco.CountryConverter()
 
 from get_contexts import GetContexts
 
@@ -56,7 +54,7 @@ def index(request):
     headers = {"Access-Control-Allow-Origin": "*"}
 
     try:
-        service = GetContexts(globals()["bigquery"], os.getenv("BIGQUERY_SNAPSHOT"), globals()["cc"])
+        service = GetContexts(globals()["bigquery"], os.getenv("BIGQUERY_SNAPSHOT"))
         service.call()
         return (service.result, 200, headers)
     except Exception as e:
