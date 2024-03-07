@@ -1,19 +1,15 @@
-# output "staging_contexts_cloud_function_url" {
-#   value = module.staging.contexts_cloud_function_url
-# }
-
-output "dns_name_servers" {
-  value = module.dns.dns_name_servers
+output "production_contexts_cloud_function_url" {
+  value = module.production.contexts_cloud_function_url
 }
 
-output "lb_ip" {
-  value = module.production.lb_ip
+output "production_columns_cloud_function_url" {
+  value = module.production.columns_cloud_function_url
 }
 
-output "lb_domains" {
-  value = module.production.lb_domains
+output "production_nodes_cloud_function_url" {
+  value = module.production.nodes_cloud_function_url
 }
 
-output "lb_path_rules" {
-  value = module.production.lb_path_rules
+output "production_top_nodes_cloud_function_url" {
+  value = module.production.top_nodes_cloud_function_url
 }

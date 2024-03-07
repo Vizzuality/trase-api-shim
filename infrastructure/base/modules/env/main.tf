@@ -28,9 +28,9 @@ resource "google_project_service" "compute_api" {
   disable_on_destroy = false
 }
 
-locals {
-  domain = var.subdomain == "" ? var.domain : "${var.subdomain}.${var.domain}"
-}
+# locals {
+#   domain = var.subdomain == "" ? var.domain : "${var.subdomain}.${var.domain}"
+# }
 
 module "bigquery_credentials" {
   source           = "../secret_value"
@@ -146,37 +146,37 @@ variable "roles" {
   ]
 }
 
-module "load_balancer" {
-  source                = "../load-balancer"
-  region                = var.gcp_region
-  project               = var.gcp_project_id
-  name                  = var.project_name
-  domain                = var.domain
-  subdomain             = var.subdomain
-  dns_managed_zone_name = var.dns_zone_name
-  functions_path_prefix = var.functions_path_prefix
+# module "load_balancer" {
+#   source                = "../load-balancer"
+#   region                = var.gcp_region
+#   project               = var.gcp_project_id
+#   name                  = var.project_name
+#   domain                = var.domain
+#   subdomain             = var.subdomain
+#   dns_managed_zone_name = var.dns_zone_name
+#   functions_path_prefix = var.functions_path_prefix
 
-  cloud_functions = {
-    contexts = {
-      name        = module.contexts_cloud_function.function_name
-      path_prefix = "contexts"
-    },
-    columns = {
-      name        = module.columns_cloud_function.function_name
-      path_prefix = "columns"
-    },
-    nodes = {
-      name        = module.nodes_cloud_function.function_name
-      path_prefix = "nodes"
-    },
-    top-nodes = {
-      name        = module.top_nodes_cloud_function.function_name
-      path_prefix = "top-nodes"
-    }
-  }
+#   cloud_functions = {
+#     contexts = {
+#       name        = module.contexts_cloud_function.function_name
+#       path_prefix = "contexts"
+#     },
+#     columns = {
+#       name        = module.columns_cloud_function.function_name
+#       path_prefix = "columns"
+#     },
+#     nodes = {
+#       name        = module.nodes_cloud_function.function_name
+#       path_prefix = "nodes"
+#     },
+#     top-nodes = {
+#       name        = module.top_nodes_cloud_function.function_name
+#       path_prefix = "top-nodes"
+#     }
+#   }
 
-  depends_on = [google_project_service.compute_api]
-}
+#   depends_on = [google_project_service.compute_api]
+# }
 
 module "contexts_cloud_function" {
   source                           = "../cloudfunction"

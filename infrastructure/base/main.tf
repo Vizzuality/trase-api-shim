@@ -15,9 +15,9 @@ module "production" {
   github_project                            = var.github_project
   github_branch                             = "main"
   project_name                              = var.production_project_name
-  dns_zone_name                             = module.dns.dns_zone_name
-  domain                                    = var.domain
-  subdomain                                 = var.production_subdomain
+  # dns_zone_name                             = module.dns.dns_zone_name
+  # domain                                    = var.domain
+  # subdomain                                 = var.production_subdomain
   functions_path_prefix                     = "api/v3"
   function_timeout_seconds                  = 600
   function_max_instance_count               = 1
@@ -31,8 +31,8 @@ module "production" {
   bigquery_snapshot                         = var.bigquery_snapshot
 }
 
-module "dns" {
-  source = "./modules/dns"
-  domain = var.domain
-  name   = var.gcp_project_id
-}
+# module "dns" {
+#   source = "./modules/dns"
+#   domain = var.domain
+#   name   = var.gcp_project_id
+# }

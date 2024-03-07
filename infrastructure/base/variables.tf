@@ -36,20 +36,20 @@ variable "gcp_project_id" {
   description = "GCP project id"
 }
 
-variable "domain" {
-  type        = string
-  description = "Base domain for the DNS zone"
-}
+# variable "domain" {
+#   type        = string
+#   description = "Base domain for the DNS zone"
+# }
 
 # variable "staging_subdomain" {
 #   type        = string
 #   description = "Subdomain for the staging environment"
 # }
 
-variable "production_subdomain" {
-  type        = string
-  description = "Subdomain for the production environment"
-}
+# variable "production_subdomain" {
+#   type        = string
+#   description = "Subdomain for the production environment"
+# }
 
 variable "bigquery_snapshot" {
   type        = string

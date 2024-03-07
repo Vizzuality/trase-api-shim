@@ -36,21 +36,21 @@ variable "tf_state_prefix" {
   description = "The prefix for the TF state in the Google Storage Bucket"
 }
 
-variable "dns_zone_name" {
-  type        = string
-  description = "Name for the GCP DNS Zone"
-}
+# variable "dns_zone_name" {
+#   type        = string
+#   description = "Name for the GCP DNS Zone"
+# }
 
-variable "domain" {
-  type        = string
-  description = "Base domain for the DNS zone"
-}
+# variable "domain" {
+#   type        = string
+#   description = "Base domain for the DNS zone"
+# }
 
-variable "subdomain" {
-  type        = string
-  default     = ""
-  description = "If set, it will be prepended to the domain to form a subdomain."
-}
+# variable "subdomain" {
+#   type        = string
+#   default     = ""
+#   description = "If set, it will be prepended to the domain to form a subdomain."
+# }
 
 variable "cors_origin" {
   type        = string
