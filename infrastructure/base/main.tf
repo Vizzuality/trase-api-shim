@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
     // TF does not allow vars here. Use the value from var.bucket_name from the remote-state project
-    bucket = "trase-api-tf-state"
+    bucket = "trase-mongabay-shim-tf-state"
     // TF does not allow vars here. Use the value from var.tf_state_prefix
     prefix = "state"
   }
