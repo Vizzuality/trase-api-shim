@@ -36,3 +36,7 @@ The function starts on port 8080 by default:
 ## Deployment
 
 Code changes are deployed automatically by a GH Actions workflow when pushed to the `main` branch. Please refer to [infrastructure documentation](../infrastructure/README.md) for details.
+
+## How to update the BQ snapshot
+
+In order to make the function pull data from a new snapshot, it is easiest to use terraform to update the env var with the snapshot symbol for all functions.
