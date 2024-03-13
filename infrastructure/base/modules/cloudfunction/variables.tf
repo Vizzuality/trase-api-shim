@@ -6,7 +6,7 @@ variable "region" {
 variable "bucket_location" {
   type        = string
   description = "(Required) The GCS location."
-  default     = "US"
+  default     = "EU"
 }
 
 variable "function_name" {
