@@ -39,4 +39,4 @@ Code changes are deployed automatically by a GH Actions workflow when pushed to 
 
 ## How to update the BQ snapshot
 
-In order to make the function pull data from a new snapshot, it is easiest to use terraform to update the env var with the snapshot symbol for all functions.
+In order to make the function pull data from a new snapshot, it is easiest to use terraform to update the env var `BIGQUERY_SNAPSHOT` with the snapshot symbol for all functions. Please note that the information about the snapshot symboc comes from Trase, who should also be able to tell if the new snapshot is backwards compatible. In case of schema changes, this might require adapting the Big Query queries.
